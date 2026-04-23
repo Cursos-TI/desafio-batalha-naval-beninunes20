@@ -1,25 +1,118 @@
 #include <stdio.h>
+#include <stdlib.h>
 #define RED   "\x1b[31m"
 #define RESET "\x1b[0m"
 #define LINHAS 10
 #define COLUNAS 10
 #define NAVIO 3
 
-// Desafio Batalha Naval - MateCheck
-// Este código inicial serve como base para o desenvolvimento do sistema de Batalha Naval.
-// Siga os comentários para implementar cada parte do desafio.
+/*Definições de posicionamentos*/
+int navio_horizontal(int matriz [10][10], int navio [3], int linha, int coluna){
 
-int main() {
-    // Nível Novato - Posicionamento dos Navios
-    // Sugestão: Declare uma matriz bidimensional para representar o tabuleiro (Ex: int tabuleiro[5][5];).
-    // Sugestão: Posicione dois navios no tabuleiro, um verticalmente e outro horizontalmente.
-    // Sugestão: Utilize `printf` para exibir as coordenadas de cada parte dos navios.
+    for (int i = 0; i < NAVIO; i++)
+    {
+        matriz [linha][coluna+i] = navio[i]; // Posiciona o navío na horizontal
+    }
+}
 
-    // Nível Aventureiro - Expansão do Tabuleiro e Posicionamento Diagonal
-    // Sugestão: Expanda o tabuleiro para uma matriz 10x10.
-    // Sugestão: Posicione quatro navios no tabuleiro, incluindo dois na diagonal.
-    // Sugestão: Exiba o tabuleiro completo no console, mostrando 0 para posições vazias e 3 para posições ocupadas.
+int navio_vertical(int matriz [10][10], int navio [3], int linha , int coluna){
 
+    for (int i = 0; i < NAVIO; i++)
+    {
+        matriz [linha+i][coluna] = navio[i]; // Posiciona o navío na vertical
+    }
+}
+
+int navio_diagonal(int matriz [10][10], int navio [3],int linha, int coluna){
+
+    for (int i = 0; i < NAVIO; i++)
+    {
+        matriz [linha+i][coluna+i] = navio[i]; // Posiciona o navío na diagonal decrescente para direita
+    }
+}
+
+int navio_diagonal_inversa(int matriz [10][10], int navio [3], int linha, int coluna){
+
+    for (int i = 0; i < NAVIO; i++)
+    {
+        matriz [linha+i][coluna-i] = navio[i]; // Posiciona o navío na diagonal decrescente para esquerda
+    }
+}
+
+/*Definições de habilidades*/
+//Habilidade em cruz
+int cruz_formato (int matriz [10] [10], int pos_x, int pos_y){
+    int colunas = 5;
+    int linhas = 3;
+    int meio_linhas = linhas / 2;
+    int meio_colunas = colunas / 2;
+    int cruz[linhas][colunas];
+
+    // Preenchimento
+    for (int i = 0; i < linhas; i++) {
+        for (int j = 0; j < colunas; j++) {
+            //Acha o meio para preencher
+            if (i == meio_linhas || j == meio_colunas) {
+                cruz[i][j] = 5;
+                matriz [pos_x+ i][pos_y+j] = cruz[i][j];
+            } else {
+                cruz[i][j] = 0;
+                matriz [pos_x+ i][pos_y+j] = cruz [i][j];
+            }
+        }
+
+    }
+}
+//Habilidade em cone
+int cone_formato (int matriz [10] [10], int pos_x, int pos_y){
+    int linhas = 3;
+    int colunas = 5;
+    int cone [linhas][colunas];
+    
+    // Preenche o triângulo
+    for (int i = 0; i < linhas; i++)
+    {
+        for (int j = 0; j < colunas ;j++){
+          if(j >= (2-i) && j <= (2+i))
+          {
+            cone [i][j] = 5;
+            matriz[pos_x + i][pos_y + j] = cone [i][j];
+          }else{
+            cone [i][j] = 0;
+            matriz[pos_x + i][pos_y + j] = cone [i][j];
+          }
+          
+        }
+    }
+}
+//Habilidade octaedro
+int octaedro_formato (int matriz [10] [10], int pos_x, int pos_y){
+    int colunas = 3;
+    int linhas = 3;
+    int centro = linhas / 2;
+    int octaedro[linhas][colunas];
+
+    // Preenchimento
+    for (int i = 0; i < linhas; i++) {
+        for (int j = 0; j < colunas; j++) {
+            // Calcula a distância do ponto atual ao centro
+            // abs() é o valor absoluto (sempre positivo)
+            int dist_i = abs(i - centro);
+            int dist_j = abs(j - centro);
+            // Se a soma das distâncias for menor ou igual ao raio, é 1
+            if (dist_i + dist_j <= centro) {
+                octaedro[i][j] = 5;
+                matriz[pos_x+i][pos_y+j] = octaedro[i][j];
+            } else {
+                octaedro[i][j] = 0;
+                matriz[pos_x+i][pos_y+j] = octaedro[i][j];
+            }
+        }
+    }
+}
+
+/*Função principal*/
+int main(){
     /*Declaração de variáveis*/
     char colunas_auxiliar[COLUNAS] = {'a','b','c','d','e','f','g','h','i','j'}; // Letras para identificação das colunas no tabuleiro
     int linhas_auxiliar[LINHAS] = {0,1,2,3,4,5,6,7,8,9}; //Números para identificaçaõ das linhas no tabuleiro
@@ -29,9 +122,9 @@ int main() {
     int navios[NAVIO] =  {3,3,3}; 
 
     /*Atribuição do valor inicial para toda a matriz*/
-    for (int i = 0; i < 10; i++) // Loop para linhas
+    for (int i = 0; i < LINHAS; i++) // Loop para linhas
     {
-        for (int j = 0; j < 10; j++) // Loop para colunas 
+        for (int j = 0; j < COLUNAS; j++) // Loop para colunas 
         {
             tabuleiro[i][j] = valor_inicial; // Atribuição do valor inicial (0) para toda a matriz
         }
@@ -39,30 +132,28 @@ int main() {
 
     /*Alocando os navios na matriz*/
     //Navio horizontal
-    for (int i = 0; i < NAVIO; i++)
-    {
-        tabuleiro [1][1+i] = navios[i]; // Posiciona o navío na horizontal
-    }
+    navio_horizontal(tabuleiro,navios, 0, 0);
 
     //Navio na vertical
-    for (int i = 0; i < NAVIO; i++)
-    {
-        tabuleiro [3+i][4] = navios[i]; // Posociona o navío na vertical
-    }
+    navio_vertical(tabuleiro,navios , 1 , 0);
 
     //Navio na diagonal
-    for (int i = 0; i < NAVIO; i++)
-    {
-        tabuleiro [i][7+i] = navios[i]; // Posiciona o navío a partir de uma posição nadiagonal decrescente a direita
-    }
+    navio_diagonal(tabuleiro,navios, 1, 2);
 
     //Navio na diagonal inversa
-    for (int i = 0; i < NAVIO; i++)
-    {
-        tabuleiro [6+i][2-i] = navios[i]; //Posiciona o navío a partir de uma posição a diagonal decrescente a esquerda
-    }
+    navio_diagonal_inversa(tabuleiro,navios, 0, 9);
+
+    /*Soltando poderes*/
+    //Cruz 
+    cruz_formato(tabuleiro, 3, 3);
+
+    //Cone
+    cone_formato(tabuleiro, 5, 0);
+
+    //Octaedro
+    octaedro_formato(tabuleiro, 6,6);
     
-    
+
     /*Exibição do tabuleiro */
     printf(RED "+----------------------------------------------+\n" RESET); // Bordas do tabuleiro
     printf( RED "|      " RESET);// Bordas do tabuleiro
@@ -88,28 +179,6 @@ int main() {
     }
 
     printf(RED "+----------------------------------------------+\n" RESET);// Bordas do tabuleiro
-
-
-    // Nível Mestre - Habilidades Especiais com Matrizes
-    // Sugestão: Crie matrizes para representar habilidades especiais como cone, cruz, e octaedro.
-    // Sugestão: Utilize estruturas de repetição aninhadas para preencher as áreas afetadas por essas habilidades no tabuleiro.
-    // Sugestão: Exiba o tabuleiro com as áreas afetadas, utilizando 0 para áreas não afetadas e 1 para áreas atingidas.
-
-    // Exemplos de exibição das habilidades:
-    // Exemplo para habilidade em cone:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 1 1 1 1 1
-    
-    // Exemplo para habilidade em octaedro:
-    // 0 0 1 0 0
-    // 0 1 1 1 0
-    // 0 0 1 0 0
-
-    // Exemplo para habilidade em cruz:
-    // 0 0 1 0 0
-    // 1 1 1 1 1
-    // 0 0 1 0 0
 
     return 0;
 }
